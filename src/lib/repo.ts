@@ -149,7 +149,9 @@ export async function createApp(payload: Partial<AiApp>): Promise<{ app: AiApp }
       },
     ],
     needsHelpWith: payload.needsHelpWith || null,
-    contactEmail: payload.contactEmail ? payload.contactEmail.trim() : (session.user.email || undefined),
+    contactEmail: payload.contactEmail
+      ? payload.contactEmail.trim()
+      : session.user.email || undefined,
     launchedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     helpCategories: [],
@@ -250,10 +252,7 @@ export async function addComment(slug: string, body: string): Promise<{ comment:
   return { comment };
 }
 
-export async function updateApp(
-  slug: string,
-  payload: Partial<AiApp>
-): Promise<{ app: AiApp }> {
+export async function updateApp(slug: string, payload: Partial<AiApp>): Promise<{ app: AiApp }> {
   const session = await requireSession();
 
   const app = APPS.find((app) => app.slug === slug);
@@ -271,8 +270,10 @@ export async function updateApp(
   if (payload.name) app.name = payload.name.trim();
   if (payload.tagline) app.tagline = payload.tagline.trim();
   if (payload.about !== undefined) app.about = payload.about ? payload.about.trim() : '';
-  if (payload.websiteUrl !== undefined) app.websiteUrl = payload.websiteUrl ? payload.websiteUrl.trim() : '';
-  if (payload.coverHeadline !== undefined) app.coverHeadline = payload.coverHeadline ? payload.coverHeadline.trim() : '';
+  if (payload.websiteUrl !== undefined)
+    app.websiteUrl = payload.websiteUrl ? payload.websiteUrl.trim() : '';
+  if (payload.coverHeadline !== undefined)
+    app.coverHeadline = payload.coverHeadline ? payload.coverHeadline.trim() : '';
   if (payload.coverTheme) app.coverTheme = payload.coverTheme;
   if (payload.category) app.category = payload.category;
   if (payload.builtWith) app.builtWith = payload.builtWith.trim();
