@@ -178,15 +178,17 @@ function AppActions({
 }) {
   return (
     <div className="flex gap-2">
-      <a
-        href={app.websiteUrl || '#'}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-      >
-        Try it
-        <ExternalLinkIcon className="h-3.5 w-3.5" />
-      </a>
+      {app.websiteUrl ? (
+        <a
+          href={app.websiteUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+        >
+          Try it
+          <ExternalLinkIcon className="h-3.5 w-3.5" />
+        </a>
+      ) : null}
 
       {canEdit && (
         <Link
@@ -572,6 +574,7 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
         <input
           name="coverHeadline"
           defaultValue={app.coverHeadline}
+          placeholder="Defaults to app name (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.coverHeadline?.errors} />
@@ -583,6 +586,7 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
           name="about"
           rows={3}
           defaultValue={app.about}
+          placeholder="Tell people about your app (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.about?.errors} />
@@ -605,6 +609,7 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
           name="websiteUrl"
           type="url"
           defaultValue={app.websiteUrl}
+          placeholder="https://example.com (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.websiteUrl?.errors} />

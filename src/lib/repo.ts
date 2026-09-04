@@ -197,7 +197,10 @@ export async function upvoteApp(
   }
 }
 
-export async function requestHelp(slug: string, needsHelpWith: string): Promise<{ app: AiApp }> {
+export async function requestHelp(
+  slug: string,
+  needsHelpWith: string | null
+): Promise<{ app: AiApp }> {
   const session = await requireSession();
 
   const app = APPS.find((app) => app.slug === slug);
@@ -212,7 +215,7 @@ export async function requestHelp(slug: string, needsHelpWith: string): Promise<
     throw new Error('You can only update your own apps.');
   }
 
-  app.needsHelpWith = needsHelpWith.trim();
+  app.needsHelpWith = needsHelpWith ? needsHelpWith.trim() : null;
 
   return { app };
 }
@@ -267,9 +270,9 @@ export async function updateApp(
 
   if (payload.name) app.name = payload.name.trim();
   if (payload.tagline) app.tagline = payload.tagline.trim();
-  if (payload.about !== undefined) app.about = payload.about.trim();
-  if (payload.websiteUrl !== undefined) app.websiteUrl = payload.websiteUrl.trim();
-  if (payload.coverHeadline) app.coverHeadline = payload.coverHeadline.trim();
+  if (payload.about !== undefined) app.about = payload.about ? payload.about.trim() : '';
+  if (payload.websiteUrl !== undefined) app.websiteUrl = payload.websiteUrl ? payload.websiteUrl.trim() : '';
+  if (payload.coverHeadline !== undefined) app.coverHeadline = payload.coverHeadline ? payload.coverHeadline.trim() : '';
   if (payload.coverTheme) app.coverTheme = payload.coverTheme;
   if (payload.category) app.category = payload.category;
   if (payload.builtWith) app.builtWith = payload.builtWith.trim();

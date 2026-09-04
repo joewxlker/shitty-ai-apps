@@ -7,7 +7,7 @@ import z from 'zod';
 export const requestHelpAction = async (slug: string, formData: FormData) => {
   const parsed = z
     .object({
-      help: z.string().trim().min(1),
+      help: z.string().trim().optional(),
     })
     .safeParse({
       help: formData.get('help'),
@@ -17,7 +17,7 @@ export const requestHelpAction = async (slug: string, formData: FormData) => {
     return;
   }
 
-  await requestHelp(slug, parsed.data.help);
+  await requestHelp(slug, parsed.data.help || null);
 
   updateTag(slug);
   updateTag('apps');

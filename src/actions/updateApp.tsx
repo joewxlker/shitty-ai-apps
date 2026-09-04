@@ -4,6 +4,22 @@ import { updateApp } from '@/lib/repo';
 import { updateTag } from 'next/cache';
 import { z } from 'zod';
 
+const emptyOrUrl = z
+  .string()
+  .trim()
+  .refine((val) => !val || z.string().url().safeParse(val).success, {
+    message: 'Enter a valid website URL.',
+  })
+  .optional();
+
+const emptyOrEmail = z
+  .string()
+  .trim()
+  .refine((val) => !val || z.string().email().safeParse(val).success, {
+    message: 'Enter a valid contact email.',
+  })
+  .optional();
+
 const updateAppSchema = z.object({
   name: z.string().trim().min(1, 'App name is required.'),
   emoji: z.string().trim().min(1, 'Emoji is required.'),
@@ -11,11 +27,11 @@ const updateAppSchema = z.object({
   coverHeadline: z.string().trim().optional(),
   about: z.string().trim().optional(),
   builtWith: z.string().trim().min(1, 'Built with is required.'),
-  websiteUrl: z.url('Enter a valid website URL.').or(z.literal('')).optional(),
+  websiteUrl: emptyOrUrl,
   category: z.enum(['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun']),
   coverTheme: z.enum(['dark', 'light', 'mint', 'sunset']),
   needsHelpWith: z.string().trim().optional(),
-  contactEmail: z.string().trim().email('Enter a valid contact email.').or(z.literal('')).optional(),
+  contactEmail: emptyOrEmail,
 });
 
 export type UpdateAppState = {
@@ -56,9 +72,11 @@ export async function updateAppAction(
   try {
     await updateApp(slug, {
       ...data,
-      coverHeadline: data.coverHeadline || data.name,
-      needsHelpWith: data.needsHelpWith || null,
-      contactEmail: data.contactEmail || undefined,
+      coverHeadline: data.coverHeadline ? data.coverHeadline.trim() : '',
+      about: data.about ? data.about.trim() : '',
+      websiteUrl: data.websiteUrl ? data.websiteUrl.trim() : '',
+      needsHelpWith: data.needsHelpWith ? data.needsHelpWith.trim() : null,
+      contactEmail: data.contactEmail ? data.contactEmail.trim() : '',
     });
 
     updateTag(slug);
