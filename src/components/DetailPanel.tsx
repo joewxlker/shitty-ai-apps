@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useTransition, type ReactNode } from 'react';
+import { useRef, useState, useTransition, type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { addCommentAction } from '@/actions/addComment';
@@ -63,6 +63,15 @@ export function DetailPanel({
   const isContributorEditing = sessionIsContributor && isEditing;
   const hasUpvoted = Boolean(session?.user?.id && app.upvoters?.includes(session.user.id));
 
+  const commentInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDiscussInComments = () => {
+    if (commentInputRef.current) {
+      commentInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      commentInputRef.current.focus({ preventScroll: true });
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-panel">
       <PanelHeader
@@ -92,10 +101,17 @@ export function DetailPanel({
               initialOpen={initialShowHelpForm}
             />
           ) : (
-            <VisitorHelpBlock app={app} />
+            <VisitorHelpBlock
+              app={app}
+              onDiscussInComments={handleDiscussInComments}
+            />
           )}
           <HelpCategories categories={app.helpCategories} />
-          <Comments slug={app.slug} comments={comments} />
+          <Comments
+            slug={app.slug}
+            comments={comments}
+            inputRef={commentInputRef}
+          />
         </div>
       )}
     </div>
@@ -236,7 +252,13 @@ function Story({ story }: { story: string }) {
   );
 }
 
-function VisitorHelpBlock({ app }: { app: App }) {
+function VisitorHelpBlock({
+  app,
+  onDiscussInComments,
+}: {
+  app: App;
+  onDiscussInComments?: () => void;
+}) {
   if (!app.needsHelpWith) return null;
 
   const mailSubject = encodeURIComponent(`[shitty ai apps] Offer to help with ${app.name}`);
@@ -246,6 +268,18 @@ function VisitorHelpBlock({ app }: { app: App }) {
   const mailtoUrl = app.contactEmail
     ? `mailto:${app.contactEmail}?subject=${mailSubject}&body=${mailBody}`
     : undefined;
+
+  const handleDiscuss = () => {
+    if (onDiscussInComments) {
+      onDiscussInComments();
+    } else {
+      const input = document.getElementById(`comment-input-${app.slug}`) as HTMLInputElement | null;
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus({ preventScroll: true });
+      }
+    }
+  };
 
   return (
     <section>
@@ -272,13 +306,14 @@ function VisitorHelpBlock({ app }: { app: App }) {
             </a>
           ) : null}
 
-          <a
-            href="#comments-section"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
+          <button
+            type="button"
+            onClick={handleDiscuss}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
           >
             <MessageCircleIcon className="h-3.5 w-3.5" />
             Discuss in comments
-          </a>
+          </button>
         </div>
       </div>
     </section>
@@ -393,7 +428,15 @@ function HelpCategories({ categories }: { categories: HelpCategory[] }) {
   );
 }
 
-function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
+function Comments({
+  slug,
+  comments,
+  inputRef,
+}: {
+  slug: string;
+  comments: Comment[];
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+}) {
   return (
     <div id="comments-section">
       <Section title={`Comments (${comments.length})`}>
@@ -421,6 +464,8 @@ function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
 
       <form action={addCommentAction.bind(null, slug)} className="mt-3 flex gap-2">
         <input
+          ref={inputRef}
+          id={`comment-input-${slug}`}
           name="comment"
           placeholder="Add a comment…"
           className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
