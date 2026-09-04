@@ -434,7 +434,7 @@ function HelpCategories({ categories }: { categories: HelpCategory[] }) {
               alt=""
               width={32}
               height={32}
-              className="rounded-full object-cover"
+              className="h-8 w-8 shrink-0 rounded-full object-cover"
             />
             <div className="text-sm">
               <p className="font-medium text-slate-900">{help.label}</p>
@@ -468,13 +468,13 @@ function Comments({
       <Section title={`Comments (${comments.length})`}>
         <div className="mt-3 flex flex-col gap-3">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex gap-2.5">
+            <div key={comment.id} className="flex items-start gap-2.5">
               <Image
                 src={comment.avatarUrl}
                 alt={comment.author}
                 width={28}
                 height={28}
-                className="mt-0.5 rounded-full object-cover"
+                className="mt-0.5 h-7 w-7 shrink-0 rounded-full object-cover"
               />
               <div className="flex-1 rounded-lg bg-slate-50 p-2.5">
                 <p className="text-xs font-semibold text-slate-900">{comment.author}</p>
