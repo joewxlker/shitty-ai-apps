@@ -149,6 +149,9 @@ export async function createApp(payload: Partial<AiApp>): Promise<{ app: AiApp }
       },
     ],
     needsHelpWith: payload.needsHelpWith || null,
+    contactEmail: payload.contactEmail
+      ? payload.contactEmail.trim()
+      : session.user.email || undefined,
     launchedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     helpCategories: [],
@@ -196,7 +199,10 @@ export async function upvoteApp(
   }
 }
 
-export async function requestHelp(slug: string, needsHelpWith: string): Promise<{ app: AiApp }> {
+export async function requestHelp(
+  slug: string,
+  needsHelpWith: string | null
+): Promise<{ app: AiApp }> {
   const session = await requireSession();
 
   const app = APPS.find((app) => app.slug === slug);
@@ -211,7 +217,7 @@ export async function requestHelp(slug: string, needsHelpWith: string): Promise<
     throw new Error('You can only update your own apps.');
   }
 
-  app.needsHelpWith = needsHelpWith.trim();
+  app.needsHelpWith = needsHelpWith ? needsHelpWith.trim() : null;
 
   return { app };
 }
@@ -246,10 +252,7 @@ export async function addComment(slug: string, body: string): Promise<{ comment:
   return { comment };
 }
 
-export async function updateApp(
-  slug: string,
-  payload: Partial<AiApp>
-): Promise<{ app: AiApp }> {
+export async function updateApp(slug: string, payload: Partial<AiApp>): Promise<{ app: AiApp }> {
   const session = await requireSession();
 
   const app = APPS.find((app) => app.slug === slug);
@@ -266,9 +269,11 @@ export async function updateApp(
 
   if (payload.name) app.name = payload.name.trim();
   if (payload.tagline) app.tagline = payload.tagline.trim();
-  if (payload.about !== undefined) app.about = payload.about.trim();
-  if (payload.websiteUrl !== undefined) app.websiteUrl = payload.websiteUrl.trim();
-  if (payload.coverHeadline) app.coverHeadline = payload.coverHeadline.trim();
+  if (payload.about !== undefined) app.about = payload.about ? payload.about.trim() : '';
+  if (payload.websiteUrl !== undefined)
+    app.websiteUrl = payload.websiteUrl ? payload.websiteUrl.trim() : '';
+  if (payload.coverHeadline !== undefined)
+    app.coverHeadline = payload.coverHeadline ? payload.coverHeadline.trim() : '';
   if (payload.coverTheme) app.coverTheme = payload.coverTheme;
   if (payload.category) app.category = payload.category;
   if (payload.builtWith) app.builtWith = payload.builtWith.trim();
@@ -276,18 +281,27 @@ export async function updateApp(
   if (payload.needsHelpWith !== undefined) {
     app.needsHelpWith = payload.needsHelpWith ? payload.needsHelpWith.trim() : null;
   }
+  if (payload.contactEmail !== undefined) {
+    app.contactEmail = payload.contactEmail ? payload.contactEmail.trim() : undefined;
+  }
 
   return { app };
 }
 
 export async function getUserApps(userId: string): Promise<AppWithCommentCount[]> {
-  return APPS.filter((app) =>
-    app.contributors.some((contributor) => contributor.id === userId)
-  ).map((app) => ({
-    ...app,
-    upvoters: app.upvoters ?? [],
-    commentCount: getCommentCount(app.slug),
-  }));
+  return unstable_cache(
+    async () => {
+      return APPS.filter((app) =>
+        app.contributors.some((contributor) => contributor.id === userId)
+      ).map((app) => ({
+        ...app,
+        upvoters: app.upvoters ?? [],
+        commentCount: getCommentCount(app.slug),
+      }));
+    },
+    ['user-apps', userId],
+    { tags: ['apps', `user-${userId}`] }
+  )();
 }
 
 export async function deleteApp(slug: string): Promise<void> {

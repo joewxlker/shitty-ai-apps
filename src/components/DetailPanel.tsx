@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useTransition, type ReactNode } from 'react';
+import { useRef, useState, useTransition, type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { addCommentAction } from '@/actions/addComment';
@@ -16,7 +16,16 @@ import type { AppWithCommentCount, Category, Comment, CoverTheme } from '@/lib/t
 import { AppCover } from './AppCover';
 import { CategoryPill } from './CategoryPill';
 import { EmojiPicker } from './EmojiPicker';
-import { ArrowLeftIcon, DollarIcon, ExternalLinkIcon, PencilIcon, UsersIcon, XIcon } from './icons';
+import {
+  ArrowLeftIcon,
+  DollarIcon,
+  ExternalLinkIcon,
+  MailIcon,
+  MessageCircleIcon,
+  PencilIcon,
+  UsersIcon,
+  XIcon,
+} from './icons';
 import { useSession } from '@/context/SessionContext';
 
 const CATEGORIES: Category[] = ['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun'];
@@ -54,6 +63,15 @@ export function DetailPanel({
   const isContributorEditing = sessionIsContributor && isEditing;
   const hasUpvoted = Boolean(session?.user?.id && app.upvoters?.includes(session.user.id));
 
+  const commentInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDiscussInComments = () => {
+    if (commentInputRef.current) {
+      commentInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      commentInputRef.current.focus({ preventScroll: true });
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-panel">
       <PanelHeader
@@ -79,20 +97,21 @@ export function DetailPanel({
             <HelpRequest
               slug={app.slug}
               needsHelpWith={app.needsHelpWith}
+              contactEmail={app.contactEmail}
               initialOpen={initialShowHelpForm}
             />
-          ) : app.needsHelpWith ? (
-            <section>
-              <div className="rounded-xl bg-brand-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
-                  They need help with
-                </p>
-                <p className="mt-1 text-base font-medium text-slate-900">{app.needsHelpWith}</p>
-              </div>
-            </section>
-          ) : null}
+          ) : (
+            <VisitorHelpBlock
+              app={app}
+              onDiscussInComments={handleDiscussInComments}
+            />
+          )}
           <HelpCategories categories={app.helpCategories} />
-          <Comments slug={app.slug} comments={comments} />
+          <Comments
+            slug={app.slug}
+            comments={comments}
+            inputRef={commentInputRef}
+          />
         </div>
       )}
     </div>
@@ -159,15 +178,17 @@ function AppActions({
 }) {
   return (
     <div className="flex gap-2">
-      <a
-        href={app.websiteUrl || '#'}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-      >
-        Try it
-        <ExternalLinkIcon className="h-3.5 w-3.5" />
-      </a>
+      {app.websiteUrl ? (
+        <a
+          href={app.websiteUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+        >
+          Try it
+          <ExternalLinkIcon className="h-3.5 w-3.5" />
+        </a>
+      ) : null}
 
       {canEdit && (
         <Link
@@ -233,13 +254,83 @@ function Story({ story }: { story: string }) {
   );
 }
 
+function VisitorHelpBlock({
+  app,
+  onDiscussInComments,
+}: {
+  app: App;
+  onDiscussInComments?: () => void;
+}) {
+  if (!app.needsHelpWith) return null;
+
+  const mailSubject = encodeURIComponent(`[shitty ai apps] Offer to help with ${app.name}`);
+  const mailBody = encodeURIComponent(
+    `Hi,\n\nI saw your project "${app.name}" on shitty ai apps and that you're looking for help with:\n"${app.needsHelpWith}"\n\nHere is how I can help:\n`
+  );
+  const mailtoUrl = app.contactEmail
+    ? `mailto:${app.contactEmail}?subject=${mailSubject}&body=${mailBody}`
+    : undefined;
+
+  const handleDiscuss = () => {
+    if (onDiscussInComments) {
+      onDiscussInComments();
+    } else {
+      const input = document.getElementById(`comment-input-${app.slug}`) as HTMLInputElement | null;
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus({ preventScroll: true });
+      }
+    }
+  };
+
+  return (
+    <section>
+      <div className="rounded-2xl border border-brand-200 bg-brand-50/70 p-5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-brand-500" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand-700">
+            They need help with
+          </p>
+        </div>
+
+        <p className="mt-2 text-base font-semibold leading-relaxed text-slate-900">
+          {app.needsHelpWith}
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {mailtoUrl ? (
+            <a
+              href={mailtoUrl}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+            >
+              <MailIcon className="h-4 w-4" />
+              Offer to help via Email
+            </a>
+          ) : null}
+
+          <button
+            type="button"
+            onClick={handleDiscuss}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
+          >
+            <MessageCircleIcon className="h-3.5 w-3.5" />
+            Discuss in comments
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HelpRequest({
   slug,
   needsHelpWith,
+  contactEmail,
   initialOpen,
 }: {
   slug: string;
   needsHelpWith: App['needsHelpWith'];
+  contactEmail?: string;
   initialOpen: boolean;
 }) {
   const [open, setOpen] = useState(initialOpen);
@@ -257,7 +348,14 @@ function HelpRequest({
         </p>
 
         {needsHelpWith ? (
-          <p className="mt-1 text-base font-medium text-slate-900">{needsHelpWith}</p>
+          <>
+            <p className="mt-1 text-base font-medium text-slate-900">{needsHelpWith}</p>
+            {contactEmail && (
+              <p className="mt-1 text-xs text-brand-700">
+                Inquiries will be sent to: <span className="font-semibold">{contactEmail}</span>
+              </p>
+            )}
+          </>
         ) : (
           <p className="mt-1 text-sm text-slate-500">
             Nothing right now — this one&apos;s smooth sailing.
@@ -332,9 +430,18 @@ function HelpCategories({ categories }: { categories: HelpCategory[] }) {
   );
 }
 
-function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
+function Comments({
+  slug,
+  comments,
+  inputRef,
+}: {
+  slug: string;
+  comments: Comment[];
+  inputRef?: React.RefObject<HTMLInputElement | null>;
+}) {
   return (
-    <Section title={`Comments (${comments.length})`}>
+    <div id="comments-section">
+      <Section title={`Comments (${comments.length})`}>
       <div className="mt-3 flex flex-col gap-3">
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-2.5">
@@ -359,6 +466,8 @@ function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
 
       <form action={addCommentAction.bind(null, slug)} className="mt-3 flex gap-2">
         <input
+          ref={inputRef}
+          id={`comment-input-${slug}`}
           name="comment"
           placeholder="Add a comment…"
           className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
@@ -371,7 +480,8 @@ function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
         </SubmitButton>
       </form>
     </Section>
-  );
+  </div>
+);
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -464,6 +574,7 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
         <input
           name="coverHeadline"
           defaultValue={app.coverHeadline}
+          placeholder="Defaults to app name (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.coverHeadline?.errors} />
@@ -475,6 +586,7 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
           name="about"
           rows={3}
           defaultValue={app.about}
+          placeholder="Tell people about your app (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.about?.errors} />
@@ -497,6 +609,7 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
           name="websiteUrl"
           type="url"
           defaultValue={app.websiteUrl}
+          placeholder="https://example.com (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.websiteUrl?.errors} />
@@ -551,6 +664,20 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.needsHelpWith?.errors} />
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-slate-500">
+          Contact email for inquiries / help (optional)
+        </label>
+        <input
+          name="contactEmail"
+          type="email"
+          defaultValue={app.contactEmail || ''}
+          placeholder="founder@example.com (defaults to your account email)"
+          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
+        />
+        <FieldError errors={state.errors?.contactEmail?.errors} />
       </div>
 
       {state.message && <p className="text-sm text-red-600">{state.message}</p>}

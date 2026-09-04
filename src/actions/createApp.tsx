@@ -1,10 +1,26 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { z } from 'zod';
 
 import { createApp } from '@/lib/repo';
+
+const emptyOrUrl = z
+  .string()
+  .trim()
+  .refine((val) => !val || z.string().url().safeParse(val).success, {
+    message: 'Enter a valid website URL.',
+  })
+  .optional();
+
+const emptyOrEmail = z
+  .string()
+  .trim()
+  .refine((val) => !val || z.string().email().safeParse(val).success, {
+    message: 'Enter a valid contact email.',
+  })
+  .optional();
 
 const createAppSchema = z.object({
   name: z.string().trim().min(1, 'App name is required.'),
@@ -13,10 +29,11 @@ const createAppSchema = z.object({
   coverHeadline: z.string().trim().optional(),
   about: z.string().trim().optional(),
   builtWith: z.string().trim().min(1, 'Built with is required.'),
-  websiteUrl: z.url('Enter a valid website URL.').or(z.literal('')),
+  websiteUrl: emptyOrUrl,
   category: z.enum(['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun']),
   coverTheme: z.enum(['dark', 'light', 'mint', 'sunset']),
   needsHelpWith: z.string().trim().optional(),
+  contactEmail: emptyOrEmail,
 });
 
 export type CreateAppState = {
@@ -41,6 +58,7 @@ export async function createAppAction(
     category: formData.get('category'),
     coverTheme: formData.get('coverTheme'),
     needsHelpWith: formData.get('needsHelpWith'),
+    contactEmail: formData.get('contactEmail'),
   });
 
   if (!result.success) {
@@ -58,6 +76,7 @@ export async function createAppAction(
       ...data,
       coverHeadline: data.coverHeadline || data.name,
       needsHelpWith: data.needsHelpWith || null,
+      contactEmail: data.contactEmail || undefined,
     });
 
     slug = result.app.slug;
@@ -68,5 +87,6 @@ export async function createAppAction(
   }
 
   updateTag('apps');
+  revalidatePath('/', 'layout');
   redirect(`/apps/${slug}`);
 }

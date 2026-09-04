@@ -1,8 +1,24 @@
 'use server';
 
 import { updateApp } from '@/lib/repo';
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { z } from 'zod';
+
+const emptyOrUrl = z
+  .string()
+  .trim()
+  .refine((val) => !val || z.string().url().safeParse(val).success, {
+    message: 'Enter a valid website URL.',
+  })
+  .optional();
+
+const emptyOrEmail = z
+  .string()
+  .trim()
+  .refine((val) => !val || z.string().email().safeParse(val).success, {
+    message: 'Enter a valid contact email.',
+  })
+  .optional();
 
 const updateAppSchema = z.object({
   name: z.string().trim().min(1, 'App name is required.'),
@@ -11,10 +27,11 @@ const updateAppSchema = z.object({
   coverHeadline: z.string().trim().optional(),
   about: z.string().trim().optional(),
   builtWith: z.string().trim().min(1, 'Built with is required.'),
-  websiteUrl: z.url('Enter a valid website URL.').or(z.literal('')).optional(),
+  websiteUrl: emptyOrUrl,
   category: z.enum(['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun']),
   coverTheme: z.enum(['dark', 'light', 'mint', 'sunset']),
   needsHelpWith: z.string().trim().optional(),
+  contactEmail: emptyOrEmail,
 });
 
 export type UpdateAppState = {
@@ -41,6 +58,7 @@ export async function updateAppAction(
     category: formData.get('category'),
     coverTheme: formData.get('coverTheme'),
     needsHelpWith: formData.get('needsHelpWith'),
+    contactEmail: formData.get('contactEmail'),
   });
 
   if (!result.success) {
@@ -54,12 +72,16 @@ export async function updateAppAction(
   try {
     await updateApp(slug, {
       ...data,
-      coverHeadline: data.coverHeadline || data.name,
-      needsHelpWith: data.needsHelpWith || null,
+      coverHeadline: data.coverHeadline ? data.coverHeadline.trim() : '',
+      about: data.about ? data.about.trim() : '',
+      websiteUrl: data.websiteUrl ? data.websiteUrl.trim() : '',
+      needsHelpWith: data.needsHelpWith ? data.needsHelpWith.trim() : null,
+      contactEmail: data.contactEmail ? data.contactEmail.trim() : '',
     });
 
     updateTag(slug);
     updateTag('apps');
+    revalidatePath('/', 'layout');
 
     return { success: true };
   } catch (error) {

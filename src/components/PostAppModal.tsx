@@ -179,6 +179,21 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
             <FieldError errors={state.errors?.needsHelpWith?.errors} />
           </div>
 
+          <div>
+            <label className="text-xs font-medium text-slate-500">
+              Contact email for inquiries / help (optional)
+            </label>
+
+            <input
+              name="contactEmail"
+              type="email"
+              placeholder="founder@example.com (defaults to your account email)"
+              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
+            />
+
+            <FieldError errors={state.errors?.contactEmail?.errors} />
+          </div>
+
           {state.message && <p className="text-sm text-red-600">{state.message}</p>}
 
           <button

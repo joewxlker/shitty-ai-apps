@@ -1,7 +1,7 @@
 'use server';
 
 import { getSession, upvoteApp } from '@/lib/repo';
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function upvoteAppAction(slug: string) {
@@ -15,5 +15,6 @@ export async function upvoteAppAction(slug: string) {
   if (result.changed) {
     updateTag(slug);
     updateTag('apps');
+    revalidatePath('/', 'layout');
   }
 }
