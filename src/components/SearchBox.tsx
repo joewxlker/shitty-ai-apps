@@ -9,6 +9,7 @@ export function SearchBox({ value, onChange }: { value: string; onChange: (v: st
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        maxLength={100}
         placeholder="Search apps..."
         className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none placeholder:text-slate-400 focus:border-brand-400"
       />

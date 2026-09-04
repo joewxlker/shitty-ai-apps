@@ -7,7 +7,7 @@ import z from 'zod';
 export const requestHelpAction = async (slug: string, formData: FormData) => {
   const parsed = z
     .object({
-      help: z.string().trim().optional(),
+      help: z.string().trim().max(200, 'Help request must be 200 characters or fewer.').optional(),
     })
     .safeParse({
       help: formData.get('help'),

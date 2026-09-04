@@ -7,7 +7,7 @@ import z from 'zod';
 export const addCommentAction = async (slug: string, formData: FormData) => {
   const parsed = z
     .object({
-      comment: z.string().trim().min(1),
+      comment: z.string().trim().min(1).max(500, 'Comment must be 500 characters or fewer.'),
     })
     .safeParse({
       comment: formData.get('comment'),

@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { createAppAction, CreateAppState } from '@/actions/createApp';
 import { Category, CoverTheme } from '@/lib/types';
 import { EmojiPicker } from './EmojiPicker';
+import { LimitedInput, LimitedTextarea } from './LimitedInput';
 import { XIcon } from './icons';
 
 const CATEGORIES: Category[] = ['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun'];
@@ -49,9 +50,10 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
             <div className="flex-1">
               <label className="text-xs font-medium text-slate-500">App name</label>
 
-              <input
+              <LimitedInput
                 name="name"
                 required
+                maxLength={60}
                 placeholder="InvoiceGoblin"
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
               />
@@ -63,9 +65,10 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
           <div>
             <label className="text-xs font-medium text-slate-500">One-line tagline</label>
 
-            <input
+            <LimitedInput
               name="tagline"
               required
+              maxLength={140}
               placeholder="AI that argues with vendors about invoices so you don't have to."
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
             />
@@ -78,8 +81,9 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
               Cover headline (shown on the card)
             </label>
 
-            <input
+            <LimitedInput
               name="coverHeadline"
+              maxLength={80}
               placeholder="Turn invoices into paid invoices"
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
             />
@@ -90,9 +94,10 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
           <div>
             <label className="text-xs font-medium text-slate-500">About</label>
 
-            <textarea
+            <LimitedTextarea
               name="about"
               rows={3}
+              maxLength={1000}
               placeholder="What does it actually do?"
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
             />
@@ -104,8 +109,9 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
             <div>
               <label className="text-xs font-medium text-slate-500">Built with</label>
 
-              <input
+              <LimitedInput
                 name="builtWith"
+                maxLength={100}
                 defaultValue="Built with Claude"
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
               />
@@ -116,9 +122,10 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
             <div>
               <label className="text-xs font-medium text-slate-500">Website URL</label>
 
-              <input
+              <LimitedInput
                 name="websiteUrl"
                 type="url"
+                maxLength={200}
                 placeholder="https://"
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
               />
@@ -170,8 +177,9 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
               Need help with anything? (optional)
             </label>
 
-            <input
+            <LimitedInput
               name="needsHelpWith"
+              maxLength={200}
               placeholder="Getting customers, design feedback…"
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
             />
@@ -184,9 +192,10 @@ export function PostAppModal({ onClose }: { onClose: () => void }) {
               Contact email for inquiries / help (optional)
             </label>
 
-            <input
+            <LimitedInput
               name="contactEmail"
               type="email"
+              maxLength={100}
               placeholder="founder@example.com (defaults to your account email)"
               className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
             />

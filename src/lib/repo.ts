@@ -217,6 +217,10 @@ export async function requestHelp(
     throw new Error('You can only update your own apps.');
   }
 
+  if (needsHelpWith && needsHelpWith.trim().length > 200) {
+    throw new Error('Help request must be 200 characters or fewer.');
+  }
+
   app.needsHelpWith = needsHelpWith ? needsHelpWith.trim() : null;
 
   return { app };
@@ -233,6 +237,10 @@ export async function addComment(slug: string, body: string): Promise<{ comment:
 
   if (!body.trim()) {
     throw new Error('Comment body is required.');
+  }
+
+  if (body.trim().length > 500) {
+    throw new Error('Comment must be 500 characters or fewer.');
   }
 
   const comment = {

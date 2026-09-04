@@ -16,6 +16,8 @@ import type { AppWithCommentCount, Category, Comment, CoverTheme } from '@/lib/t
 import { AppCover } from './AppCover';
 import { CategoryPill } from './CategoryPill';
 import { EmojiPicker } from './EmojiPicker';
+import { ExpandableText } from './ExpandableText';
+import { LimitedInput, LimitedTextarea } from './LimitedInput';
 import {
   ArrowLeftIcon,
   DollarIcon,
@@ -223,7 +225,11 @@ function AppActions({
 function About({ app }: { app: App }) {
   return (
     <Section title="About">
-      <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{app.about}</p>
+      <ExpandableText
+        text={app.about}
+        limit={240}
+        className="mt-1.5 text-sm leading-relaxed text-slate-600"
+      />
     </Section>
   );
 }
@@ -249,7 +255,11 @@ function TechStack({ app }: { app: App }) {
 function Story({ story }: { story: string }) {
   return (
     <Section title="The story">
-      <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{story}</p>
+      <ExpandableText
+        text={story}
+        limit={240}
+        className="mt-1.5 text-sm leading-relaxed text-slate-600"
+      />
     </Section>
   );
 }
@@ -293,9 +303,11 @@ function VisitorHelpBlock({
           </p>
         </div>
 
-        <p className="mt-2 text-base font-semibold leading-relaxed text-slate-900">
-          {app.needsHelpWith}
-        </p>
+        <ExpandableText
+          text={app.needsHelpWith}
+          limit={200}
+          className="mt-2 text-base font-semibold leading-relaxed text-slate-900"
+        />
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
           {mailtoUrl ? (
@@ -349,7 +361,11 @@ function HelpRequest({
 
         {needsHelpWith ? (
           <>
-            <p className="mt-1 text-base font-medium text-slate-900">{needsHelpWith}</p>
+            <ExpandableText
+              text={needsHelpWith}
+              limit={200}
+              className="mt-1 text-base font-medium text-slate-900"
+            />
             {contactEmail && (
               <p className="mt-1 text-xs text-brand-700">
                 Inquiries will be sent to: <span className="font-semibold">{contactEmail}</span>
@@ -364,12 +380,13 @@ function HelpRequest({
 
         {open ? (
           <form action={submit} className="mt-3 flex flex-col gap-2">
-            <input
+            <LimitedInput
               autoFocus
               name="help"
+              maxLength={200}
               defaultValue={needsHelpWith || ''}
               placeholder="e.g. Getting customers, Design feedback…"
-              className="rounded-lg border border-brand-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400"
+              className="w-full rounded-lg border border-brand-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-400"
             />
 
             <div className="flex gap-2">
@@ -439,49 +456,64 @@ function Comments({
   comments: Comment[];
   inputRef?: React.RefObject<HTMLInputElement | null>;
 }) {
+  const [commentText, setCommentText] = useState('');
+
+  const handleAddComment = async (formData: FormData) => {
+    await addCommentAction(slug, formData);
+    setCommentText('');
+  };
+
   return (
     <div id="comments-section">
       <Section title={`Comments (${comments.length})`}>
-      <div className="mt-3 flex flex-col gap-3">
-        {comments.map((comment) => (
-          <div key={comment.id} className="flex gap-2.5">
-            <Image
-              src={comment.avatarUrl}
-              alt={comment.author}
-              width={28}
-              height={28}
-              className="mt-0.5 rounded-full object-cover"
-            />
-            <div className="flex-1 rounded-lg bg-slate-50 p-2.5">
-              <p className="text-xs font-semibold text-slate-900">{comment.author}</p>
-              <p className="mt-0.5 text-sm text-slate-600">{comment.body}</p>
+        <div className="mt-3 flex flex-col gap-3">
+          {comments.map((comment) => (
+            <div key={comment.id} className="flex gap-2.5">
+              <Image
+                src={comment.avatarUrl}
+                alt={comment.author}
+                width={28}
+                height={28}
+                className="mt-0.5 rounded-full object-cover"
+              />
+              <div className="flex-1 rounded-lg bg-slate-50 p-2.5">
+                <p className="text-xs font-semibold text-slate-900">{comment.author}</p>
+                <ExpandableText
+                  text={comment.body}
+                  limit={180}
+                  className="mt-0.5 text-sm text-slate-600"
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {comments.length === 0 && (
-          <p className="text-sm text-slate-400">No comments yet. Be first.</p>
-        )}
-      </div>
+          {comments.length === 0 && (
+            <p className="text-sm text-slate-400">No comments yet. Be first.</p>
+          )}
+        </div>
 
-      <form action={addCommentAction.bind(null, slug)} className="mt-3 flex gap-2">
-        <input
-          ref={inputRef}
-          id={`comment-input-${slug}`}
-          name="comment"
-          placeholder="Add a comment…"
-          className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
-        />
-        <SubmitButton
-          pendingLabel="Posting…"
-          className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-colors disabled:opacity-40"
-        >
-          Post
-        </SubmitButton>
-      </form>
-    </Section>
-  </div>
-);
+        <form action={handleAddComment} className="mt-3 flex items-start gap-2">
+          <LimitedInput
+            ref={inputRef}
+            id={`comment-input-${slug}`}
+            name="comment"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            maxLength={500}
+            placeholder="Add a comment…"
+            containerClassName="flex-1"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
+          />
+          <SubmitButton
+            pendingLabel="Posting…"
+            className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-colors disabled:opacity-40"
+          >
+            Post
+          </SubmitButton>
+        </form>
+      </Section>
+    </div>
+  );
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -546,9 +578,10 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
 
         <div className="flex-1">
           <label className="text-xs font-medium text-slate-500">App name</label>
-          <input
+          <LimitedInput
             name="name"
             defaultValue={app.name}
+            maxLength={60}
             required
             className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
           />
@@ -558,9 +591,10 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
 
       <div>
         <label className="text-xs font-medium text-slate-500">One-line tagline</label>
-        <input
+        <LimitedInput
           name="tagline"
           defaultValue={app.tagline}
+          maxLength={140}
           required
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
@@ -571,9 +605,10 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
         <label className="text-xs font-medium text-slate-500">
           Cover headline (shown on the card)
         </label>
-        <input
+        <LimitedInput
           name="coverHeadline"
           defaultValue={app.coverHeadline}
+          maxLength={80}
           placeholder="Defaults to app name (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
@@ -582,10 +617,11 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
 
       <div>
         <label className="text-xs font-medium text-slate-500">About the app</label>
-        <textarea
+        <LimitedTextarea
           name="about"
           rows={3}
           defaultValue={app.about}
+          maxLength={1000}
           placeholder="Tell people about your app (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
@@ -594,9 +630,10 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
 
       <div>
         <label className="text-xs font-medium text-slate-500">Built with</label>
-        <input
+        <LimitedInput
           name="builtWith"
           defaultValue={app.builtWith}
+          maxLength={100}
           required
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
@@ -605,10 +642,11 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
 
       <div>
         <label className="text-xs font-medium text-slate-500">Website URL</label>
-        <input
+        <LimitedInput
           name="websiteUrl"
           type="url"
           defaultValue={app.websiteUrl}
+          maxLength={200}
           placeholder="https://example.com (optional)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
@@ -657,9 +695,10 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
         <label className="text-xs font-medium text-slate-500">
           Need help with anything? (optional)
         </label>
-        <input
+        <LimitedInput
           name="needsHelpWith"
           defaultValue={app.needsHelpWith || ''}
+          maxLength={200}
           placeholder="Getting customers, design feedback…"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
@@ -670,10 +709,11 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
         <label className="text-xs font-medium text-slate-500">
           Contact email for inquiries / help (optional)
         </label>
-        <input
+        <LimitedInput
           name="contactEmail"
           type="email"
           defaultValue={app.contactEmail || ''}
+          maxLength={100}
           placeholder="founder@example.com (defaults to your account email)"
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
