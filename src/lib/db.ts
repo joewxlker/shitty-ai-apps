@@ -81,6 +81,7 @@ export const APPS: AiApp[] = [
     upvotes: 97,
     contributors: [contributor('c3', 'Maya Singh')],
     needsHelpWith: 'Design / UX',
+    contactEmail: 'maya@v0.dev',
     launchedAt: '2023-10-01',
     helpCategories: [
       { id: 'h1', label: 'Product Design', peopleCount: 61, avatarUrl: avatar('h1') },
@@ -109,6 +110,7 @@ export const APPS: AiApp[] = [
     upvotes: 118,
     contributors: [contributor('c4', 'Noah Williams')],
     needsHelpWith: 'Getting customers',
+    contactEmail: 'noah@bolt.new',
     launchedAt: '2024-10-01',
     helpCategories: [
       { id: 'h3', label: 'Growth / Marketing', peopleCount: 124, avatarUrl: avatar('h3') },

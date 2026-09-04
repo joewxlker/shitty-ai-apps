@@ -16,7 +16,16 @@ import type { AppWithCommentCount, Category, Comment, CoverTheme } from '@/lib/t
 import { AppCover } from './AppCover';
 import { CategoryPill } from './CategoryPill';
 import { EmojiPicker } from './EmojiPicker';
-import { ArrowLeftIcon, DollarIcon, ExternalLinkIcon, PencilIcon, UsersIcon, XIcon } from './icons';
+import {
+  ArrowLeftIcon,
+  DollarIcon,
+  ExternalLinkIcon,
+  MailIcon,
+  MessageCircleIcon,
+  PencilIcon,
+  UsersIcon,
+  XIcon,
+} from './icons';
 import { useSession } from '@/context/SessionContext';
 
 const CATEGORIES: Category[] = ['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun'];
@@ -79,18 +88,12 @@ export function DetailPanel({
             <HelpRequest
               slug={app.slug}
               needsHelpWith={app.needsHelpWith}
+              contactEmail={app.contactEmail}
               initialOpen={initialShowHelpForm}
             />
-          ) : app.needsHelpWith ? (
-            <section>
-              <div className="rounded-xl bg-brand-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
-                  They need help with
-                </p>
-                <p className="mt-1 text-base font-medium text-slate-900">{app.needsHelpWith}</p>
-              </div>
-            </section>
-          ) : null}
+          ) : (
+            <VisitorHelpBlock app={app} />
+          )}
           <HelpCategories categories={app.helpCategories} />
           <Comments slug={app.slug} comments={comments} />
         </div>
@@ -233,13 +236,64 @@ function Story({ story }: { story: string }) {
   );
 }
 
+function VisitorHelpBlock({ app }: { app: App }) {
+  if (!app.needsHelpWith) return null;
+
+  const mailSubject = encodeURIComponent(`[shitty ai apps] Offer to help with ${app.name}`);
+  const mailBody = encodeURIComponent(
+    `Hi,\n\nI saw your project "${app.name}" on shitty ai apps and that you're looking for help with:\n"${app.needsHelpWith}"\n\nHere is how I can help:\n`
+  );
+  const mailtoUrl = app.contactEmail
+    ? `mailto:${app.contactEmail}?subject=${mailSubject}&body=${mailBody}`
+    : undefined;
+
+  return (
+    <section>
+      <div className="rounded-2xl border border-brand-200 bg-brand-50/70 p-5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-brand-500" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-brand-700">
+            They need help with
+          </p>
+        </div>
+
+        <p className="mt-2 text-base font-semibold leading-relaxed text-slate-900">
+          {app.needsHelpWith}
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {mailtoUrl ? (
+            <a
+              href={mailtoUrl}
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700"
+            >
+              <MailIcon className="h-4 w-4" />
+              Offer to help via Email
+            </a>
+          ) : null}
+
+          <a
+            href="#comments-section"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
+          >
+            <MessageCircleIcon className="h-3.5 w-3.5" />
+            Discuss in comments
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HelpRequest({
   slug,
   needsHelpWith,
+  contactEmail,
   initialOpen,
 }: {
   slug: string;
   needsHelpWith: App['needsHelpWith'];
+  contactEmail?: string;
   initialOpen: boolean;
 }) {
   const [open, setOpen] = useState(initialOpen);
@@ -257,7 +311,14 @@ function HelpRequest({
         </p>
 
         {needsHelpWith ? (
-          <p className="mt-1 text-base font-medium text-slate-900">{needsHelpWith}</p>
+          <>
+            <p className="mt-1 text-base font-medium text-slate-900">{needsHelpWith}</p>
+            {contactEmail && (
+              <p className="mt-1 text-xs text-brand-700">
+                Inquiries will be sent to: <span className="font-semibold">{contactEmail}</span>
+              </p>
+            )}
+          </>
         ) : (
           <p className="mt-1 text-sm text-slate-500">
             Nothing right now — this one&apos;s smooth sailing.
@@ -334,7 +395,8 @@ function HelpCategories({ categories }: { categories: HelpCategory[] }) {
 
 function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
   return (
-    <Section title={`Comments (${comments.length})`}>
+    <div id="comments-section">
+      <Section title={`Comments (${comments.length})`}>
       <div className="mt-3 flex flex-col gap-3">
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-2.5">
@@ -371,7 +433,8 @@ function Comments({ slug, comments }: { slug: string; comments: Comment[] }) {
         </SubmitButton>
       </form>
     </Section>
-  );
+  </div>
+);
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -551,6 +614,20 @@ function EditAppForm({ app, onCancel }: { app: App; onCancel: () => void }) {
           className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
         />
         <FieldError errors={state.errors?.needsHelpWith?.errors} />
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-slate-500">
+          Contact email for inquiries / help (optional)
+        </label>
+        <input
+          name="contactEmail"
+          type="email"
+          defaultValue={app.contactEmail || ''}
+          placeholder="founder@example.com (defaults to your account email)"
+          className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
+        />
+        <FieldError errors={state.errors?.contactEmail?.errors} />
       </div>
 
       {state.message && <p className="text-sm text-red-600">{state.message}</p>}

@@ -17,6 +17,7 @@ const createAppSchema = z.object({
   category: z.enum(['SaaS', 'Lifestyle', 'Productivity', 'Dev Tools', 'Fun']),
   coverTheme: z.enum(['dark', 'light', 'mint', 'sunset']),
   needsHelpWith: z.string().trim().optional(),
+  contactEmail: z.string().trim().email('Enter a valid contact email.').or(z.literal('')).optional(),
 });
 
 export type CreateAppState = {
@@ -41,6 +42,7 @@ export async function createAppAction(
     category: formData.get('category'),
     coverTheme: formData.get('coverTheme'),
     needsHelpWith: formData.get('needsHelpWith'),
+    contactEmail: formData.get('contactEmail'),
   });
 
   if (!result.success) {
@@ -58,6 +60,7 @@ export async function createAppAction(
       ...data,
       coverHeadline: data.coverHeadline || data.name,
       needsHelpWith: data.needsHelpWith || null,
+      contactEmail: data.contactEmail || undefined,
     });
 
     slug = result.app.slug;

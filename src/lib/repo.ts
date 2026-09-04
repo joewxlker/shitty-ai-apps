@@ -149,6 +149,7 @@ export async function createApp(payload: Partial<AiApp>): Promise<{ app: AiApp }
       },
     ],
     needsHelpWith: payload.needsHelpWith || null,
+    contactEmail: payload.contactEmail ? payload.contactEmail.trim() : (session.user.email || undefined),
     launchedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     helpCategories: [],
@@ -275,6 +276,9 @@ export async function updateApp(
   if (payload.emoji) app.emoji = payload.emoji.trim();
   if (payload.needsHelpWith !== undefined) {
     app.needsHelpWith = payload.needsHelpWith ? payload.needsHelpWith.trim() : null;
+  }
+  if (payload.contactEmail !== undefined) {
+    app.contactEmail = payload.contactEmail ? payload.contactEmail.trim() : undefined;
   }
 
   return { app };
