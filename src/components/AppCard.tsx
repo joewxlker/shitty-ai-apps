@@ -192,7 +192,10 @@ function AppActions({
               </p>
             </div>
 
-            <p className="mt-2 text-sm font-medium leading-snug text-slate-800">
+            <p
+              className="mt-2 line-clamp-2 break-words text-sm font-medium leading-snug text-slate-800"
+              title={app.needsHelpWith ?? undefined}
+            >
               {app.needsHelpWith}
             </p>
           </div>
@@ -217,7 +220,10 @@ function AppActions({
               They need help with
             </p>
 
-            <p className="mt-1.5 text-sm font-medium leading-snug text-slate-800">
+            <p
+              className="mt-1.5 line-clamp-2 break-words text-sm font-medium leading-snug text-slate-800"
+              title={app.needsHelpWith ?? undefined}
+            >
               {app.needsHelpWith}
             </p>
           </div>

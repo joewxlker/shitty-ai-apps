@@ -65,7 +65,10 @@ export function CanHelp({ apps }: { apps: AppWithCommentCount[] }) {
                 <p className="mt-1 line-clamp-2 text-xs text-slate-500">{app.tagline}</p>
               </div>
               {app.needsHelpWith && (
-                <div className="rounded-lg bg-brand-50 px-2.5 py-1.5 text-xs font-medium text-brand-700">
+                <div
+                  className="line-clamp-2 break-words rounded-lg bg-brand-50 px-2.5 py-1.5 text-xs font-medium text-brand-700"
+                  title={app.needsHelpWith}
+                >
                   Needs help with: {app.needsHelpWith}
                 </div>
               )}
