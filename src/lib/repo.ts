@@ -288,13 +288,19 @@ export async function updateApp(
 }
 
 export async function getUserApps(userId: string): Promise<AppWithCommentCount[]> {
-  return APPS.filter((app) =>
-    app.contributors.some((contributor) => contributor.id === userId)
-  ).map((app) => ({
-    ...app,
-    upvoters: app.upvoters ?? [],
-    commentCount: getCommentCount(app.slug),
-  }));
+  return unstable_cache(
+    async () => {
+      return APPS.filter((app) =>
+        app.contributors.some((contributor) => contributor.id === userId)
+      ).map((app) => ({
+        ...app,
+        upvoters: app.upvoters ?? [],
+        commentCount: getCommentCount(app.slug),
+      }));
+    },
+    ['user-apps', userId],
+    { tags: ['apps', `user-${userId}`] }
+  )();
 }
 
 export async function deleteApp(slug: string): Promise<void> {

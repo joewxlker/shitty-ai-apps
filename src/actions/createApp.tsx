@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { z } from 'zod';
 
 import { createApp } from '@/lib/repo';
@@ -87,5 +87,6 @@ export async function createAppAction(
   }
 
   updateTag('apps');
+  revalidatePath('/', 'layout');
   redirect(`/apps/${slug}`);
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { updateApp } from '@/lib/repo';
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { z } from 'zod';
 
 const emptyOrUrl = z
@@ -81,6 +81,7 @@ export async function updateAppAction(
 
     updateTag(slug);
     updateTag('apps');
+    revalidatePath('/', 'layout');
 
     return { success: true };
   } catch (error) {

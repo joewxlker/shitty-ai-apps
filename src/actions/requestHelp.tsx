@@ -1,7 +1,7 @@
 'use server';
 
 import { requestHelp } from '@/lib/repo';
-import { updateTag } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import z from 'zod';
 
 export const requestHelpAction = async (slug: string, formData: FormData) => {
@@ -21,4 +21,5 @@ export const requestHelpAction = async (slug: string, formData: FormData) => {
 
   updateTag(slug);
   updateTag('apps');
+  revalidatePath('/', 'layout');
 };
