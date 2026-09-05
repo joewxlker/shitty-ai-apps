@@ -56,6 +56,21 @@ export interface AiApp {
   helpCategories: HelpCategory[];
 }
 
+export type HelpOfferStatus = 'pending' | 'accepted' | 'declined';
+
+export interface HelpOffer {
+  id: string;
+  appSlug: string;
+  senderId: string;
+  senderName: string;
+  senderAvatarUrl: string;
+  senderContact: string;
+  message: string;
+  status: HelpOfferStatus;
+  createdAt: string; // ISO
+  respondedAt?: string; // ISO
+}
+
 export interface Session {
   user: {
     id: string;

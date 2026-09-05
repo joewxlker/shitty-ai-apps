@@ -217,3 +217,29 @@ export function MailIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg {...getProps(props, 'h-4 w-4 shrink-0')}>
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+export function ClockIcon(props: IconProps) {
+  return (
+    <svg {...getProps(props, 'h-4 w-4 shrink-0')}>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+export function SendIcon(props: IconProps) {
+  return (
+    <svg {...getProps(props, 'h-4 w-4 shrink-0')}>
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  );
+}

@@ -1,4 +1,4 @@
-import { AiApp, Comment, Session } from './types';
+import { AiApp, Comment, HelpOffer, Session } from './types';
 
 const s3 = (key: string) => `https://shitty-ai-apps-assets.s3.amazonaws.com/${key}`;
 
@@ -260,4 +260,47 @@ export const SESSION: Session = {
     role: 'user',
     icon: avatar('user_123'),
   },
+};
+
+export const HELP_OFFERS: Record<string, HelpOffer[]> = {
+  perplexity: [
+    {
+      id: 'ho-1',
+      appSlug: 'perplexity',
+      senderId: 'c3',
+      senderName: 'Maya Singh',
+      senderAvatarUrl: avatar('c3'),
+      senderContact: 'maya@v0.dev',
+      message: 'I specialize in citation UX and source verification pipelines. Would love to help polish the citation formatting and source preview cards!',
+      status: 'pending',
+      createdAt: '2024-08-10T14:20:00.000Z',
+    },
+  ],
+  v0: [
+    {
+      id: 'ho-2',
+      appSlug: 'v0',
+      senderId: 'user_123',
+      senderName: 'John Doe',
+      senderAvatarUrl: avatar('user_123'),
+      senderContact: 'john@example.com',
+      message: 'I can help test and benchmark generative UI response times across different LLM backends.',
+      status: 'pending',
+      createdAt: '2024-08-11T16:45:00.000Z',
+    },
+  ],
+  bolt: [
+    {
+      id: 'ho-3',
+      appSlug: 'bolt',
+      senderId: 'c5',
+      senderName: 'Sofia Martin',
+      senderAvatarUrl: avatar('c5'),
+      senderContact: 'sofia@gamma.app',
+      message: 'Happy to collaborate on growth tactics and developer marketing for in-browser environments.',
+      status: 'accepted',
+      createdAt: '2024-08-08T09:10:00.000Z',
+      respondedAt: '2024-08-09T11:00:00.000Z',
+    },
+  ],
 };

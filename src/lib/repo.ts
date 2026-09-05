@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { APPS, COMMENTS, SESSION } from './db';
+import { APPS, COMMENTS, HELP_OFFERS, SESSION } from './db';
 import { filterApps } from './serverUtils';
-import { AiApp, AppWithCommentCount, Comment, Session, Tab } from './types';
+import { AiApp, AppWithCommentCount, Comment, HelpOffer, Session, Tab } from './types';
 
 export function getCommentCount(slug: string): number {
   return COMMENTS[slug]?.length ?? 0;
@@ -46,7 +46,7 @@ export const getCanHelpApps = unstable_cache(
 
 export async function getAppBySlug(
   slug: string
-): Promise<{ app: AppWithCommentCount; comments: Comment[] } | null> {
+): Promise<{ app: AppWithCommentCount; comments: Comment[]; helpOffers: HelpOffer[] } | null> {
   return unstable_cache(
     async () => {
       const decodedSlug = decodeURIComponent(slug);
@@ -63,6 +63,7 @@ export async function getAppBySlug(
           commentCount: getCommentCount(app.slug),
         },
         comments: COMMENTS[app.slug] ?? [],
+        helpOffers: HELP_OFFERS[app.slug] ?? [],
       };
     },
     ['app-by-slug', slug],
@@ -329,4 +330,102 @@ export async function deleteApp(slug: string): Promise<void> {
   }
 
   APPS.splice(index, 1);
+}
+
+export async function getHelpOffers(slug: string): Promise<HelpOffer[]> {
+  return HELP_OFFERS[slug] ?? [];
+}
+
+export async function submitHelpOffer(
+  slug: string,
+  message: string,
+  contact: string
+): Promise<{ offer: HelpOffer }> {
+  const session = await requireSession();
+  const app = APPS.find((a) => a.slug === slug);
+  if (!app) throw new Error('App not found.');
+  if (!app.needsHelpWith) throw new Error('This app is not currently seeking help.');
+
+  const trimmedMsg = message.trim();
+  const trimmedContact = contact.trim();
+
+  if (!trimmedMsg) throw new Error('A message is required.');
+  if (trimmedMsg.length > 500) throw new Error('Message must be 500 characters or fewer.');
+  if (!trimmedContact) throw new Error('Contact information is required.');
+
+  if (!HELP_OFFERS[slug]) {
+    HELP_OFFERS[slug] = [];
+  }
+
+  // Check if user already has a pending offer
+  const existing = HELP_OFFERS[slug].find(
+    (o) => o.senderId === session.user.id && o.status === 'pending'
+  );
+  if (existing) {
+    throw new Error('You already have a pending offer for this app.');
+  }
+
+  const offer: HelpOffer = {
+    id: crypto.randomUUID(),
+    appSlug: slug,
+    senderId: session.user.id,
+    senderName: session.user.name,
+    senderAvatarUrl: session.user.icon || `https://picsum.photos/seed/${session.user.id}/64/64`,
+    senderContact: trimmedContact,
+    message: trimmedMsg,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+
+  HELP_OFFERS[slug].unshift(offer);
+  return { offer };
+}
+
+export async function respondToHelpOffer(
+  offerId: string,
+  status: 'accepted' | 'declined'
+): Promise<{ offer: HelpOffer; app: AiApp }> {
+  const session = await requireSession();
+
+  let targetOffer: HelpOffer | null = null;
+  let targetAppSlug: string | null = null;
+
+  for (const [slug, offers] of Object.entries(HELP_OFFERS)) {
+    const found = offers.find((o) => o.id === offerId);
+    if (found) {
+      targetOffer = found;
+      targetAppSlug = slug;
+      break;
+    }
+  }
+
+  if (!targetOffer || !targetAppSlug) {
+    throw new Error('Help offer not found.');
+  }
+
+  const app = APPS.find((a) => a.slug === targetAppSlug);
+  if (!app) {
+    throw new Error('Associated app not found.');
+  }
+
+  const isContributor = app.contributors.some((c) => c.id === session.user.id);
+  if (!isContributor) {
+    throw new Error('Only project contributors can respond to help offers.');
+  }
+
+  targetOffer.status = status;
+  targetOffer.respondedAt = new Date().toISOString();
+
+  // If accepted, promote requester to contributor on the project!
+  if (status === 'accepted') {
+    if (!app.contributors.some((c) => c.id === targetOffer!.senderId)) {
+      app.contributors.push({
+        id: targetOffer.senderId,
+        name: targetOffer.senderName,
+        avatarUrl: targetOffer.senderAvatarUrl,
+      });
+    }
+  }
+
+  return { offer: targetOffer, app };
 }

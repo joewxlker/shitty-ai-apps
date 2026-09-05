@@ -25,6 +25,7 @@ export default async function AppDetailPage({
           <DetailPanel
             app={data.app}
             comments={data.comments}
+            helpOffers={data.helpOffers}
             initialShowHelpForm={resolvedSearchParams?.needHelp === '1'}
           />
         </Suspense>
