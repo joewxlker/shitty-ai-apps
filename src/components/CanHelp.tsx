@@ -5,28 +5,59 @@ import Link from 'next/link';
 import { AppWithCommentCount, HelpCategory } from '@/lib/types';
 import { AppCover } from './AppCover';
 
+const CATEGORY_LIMIT = 8;
+
 export function CanHelp({ apps }: { apps: AppWithCommentCount[] }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const categories = useMemo(() => {
     const map = new Map<string, HelpCategory>();
-    apps.forEach((a) => a.helpCategories.forEach((h) => map.set(h.label, h)));
-    return Array.from(map.values());
+    apps.forEach((a) => {
+      a.helpCategories.forEach((h) => {
+        const existing = map.get(h.label);
+        if (!existing) {
+          map.set(h.label, { ...h });
+        } else {
+          existing.peopleCount = Math.max(existing.peopleCount, h.peopleCount);
+        }
+      });
+    });
+    return Array.from(map.values()).sort(
+      (a, b) => b.peopleCount - a.peopleCount || a.label.localeCompare(b.label)
+    );
   }, [apps]);
+
+  const visibleCategories = useMemo(() => {
+    if (isExpanded || categories.length <= CATEGORY_LIMIT) {
+      return categories;
+    }
+    const topCategories = categories.slice(0, CATEGORY_LIMIT);
+    if (activeCategory && !topCategories.some((c) => c.label === activeCategory)) {
+      const activeItem = categories.find((c) => c.label === activeCategory);
+      if (activeItem) {
+        return [...topCategories, activeItem];
+      }
+    }
+    return topCategories;
+  }, [categories, isExpanded, activeCategory]);
 
   const visibleApps = activeCategory
     ? apps.filter((a) => a.helpCategories.some((h) => h.label === activeCategory))
     : apps;
 
+  const hasMoreCategories = categories.length > CATEGORY_LIMIT;
+  const remainingCount = categories.length - visibleCategories.length;
+
   return (
     <div className="flex flex-col gap-6">
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setActiveCategory(null)}
             className={[
-              'rounded-full border px-3 py-1.5 text-sm font-medium',
+              'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
               activeCategory === null
                 ? 'border-brand-500 bg-brand-50 text-brand-700'
                 : 'border-slate-200 text-slate-600 hover:border-slate-300',
@@ -34,13 +65,14 @@ export function CanHelp({ apps }: { apps: AppWithCommentCount[] }) {
           >
             All ({apps.length})
           </button>
-          {categories.map((c) => (
+          {visibleCategories.map((c) => (
             <button
               key={c.label}
               type="button"
               onClick={() => setActiveCategory(c.label)}
+              title={`${c.label} · ${c.peopleCount}`}
               className={[
-                'rounded-full border px-3 py-1.5 text-sm font-medium',
+                'rounded-full border px-3 py-1.5 text-sm font-medium truncate max-w-[180px] transition-colors',
                 activeCategory === c.label
                   ? 'border-brand-500 bg-brand-50 text-brand-700'
                   : 'border-slate-200 text-slate-600 hover:border-slate-300',
@@ -49,6 +81,15 @@ export function CanHelp({ apps }: { apps: AppWithCommentCount[] }) {
               {c.label} · {c.peopleCount}
             </button>
           ))}
+          {hasMoreCategories && (isExpanded || remainingCount > 0) && (
+            <button
+              type="button"
+              onClick={() => setIsExpanded((prev) => !prev)}
+              className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-600 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            >
+              {isExpanded ? 'Show less' : `+${remainingCount} more`}
+            </button>
+          )}
         </div>
       )}
 
