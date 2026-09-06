@@ -44,7 +44,6 @@ export interface AiApp {
   techStack: string[];
   websiteUrl: string;
   users: number;
-  mrr: number;
   category: Category;
   upvotes: number;
   upvoters?: string[];

@@ -9,7 +9,7 @@ import { useSession } from '@/context/SessionContext';
 import { AppCover } from './AppCover';
 import { AvatarStack } from './AvatarStack';
 import { CategoryPill } from './CategoryPill';
-import { ArrowUpIcon, DollarIcon, ExternalLinkIcon, MessageCircleIcon, UsersIcon } from './icons';
+import { ArrowUpIcon, ExternalLinkIcon, MessageCircleIcon, UsersIcon } from './icons';
 
 interface AppCardProps {
   app: AppWithCommentCount;
@@ -75,10 +75,6 @@ export function AppCard({ app, active = false }: AppCardProps) {
           <span className="inline-flex items-center gap-1">
             <UsersIcon className="h-4 w-4" />
             {app.users} users
-          </span>
-
-          <span className="inline-flex items-center gap-1">
-            <DollarIcon className="h-4 w-4" />${app.mrr} MRR
           </span>
 
           <CategoryPill category={app.category} />

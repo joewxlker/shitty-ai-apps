@@ -24,7 +24,6 @@ import {
   ArrowLeftIcon,
   CheckIcon,
   ClockIcon,
-  DollarIcon,
   ExternalLinkIcon,
   HeartHandshakeIcon,
   MessageCircleIcon,
@@ -162,9 +161,6 @@ function AppSummary({ app }: { app: App }) {
         <span className="inline-flex items-center gap-1">
           <UsersIcon className="h-3.5 w-3.5" />
           {app.users} users
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <DollarIcon className="h-3.5 w-3.5" />${app.mrr} MRR
         </span>
         <span>Launched {formatDate(app.launchedAt)}</span>
       </div>

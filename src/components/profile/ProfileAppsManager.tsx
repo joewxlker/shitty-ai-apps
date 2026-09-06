@@ -8,7 +8,6 @@ import type { AppWithCommentCount, Category } from '@/lib/types';
 import { CategoryPill } from '@/components/CategoryPill';
 import { ProfilePostButton } from '@/components/ProfilePostButton';
 import {
-  DollarIcon,
   ExternalLinkIcon,
   MessageCircleIcon,
   PencilIcon,
@@ -202,10 +201,6 @@ export function ProfileAppsManager({ apps }: ProfileAppsManagerProps) {
                   <span className="inline-flex items-center gap-1">
                     <UsersIcon className="h-3.5 w-3.5" />
                     {app.users.toLocaleString()} users
-                  </span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-slate-700">
-                    <DollarIcon className="h-3.5 w-3.5 text-emerald-600" />$
-                    {app.mrr.toLocaleString()} MRR
                   </span>
                   <span>▲ {app.upvotes} upvotes</span>
                   <span className="inline-flex items-center gap-1">

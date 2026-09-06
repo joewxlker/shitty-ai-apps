@@ -34,7 +34,7 @@ export const getFeedApps = unstable_cache(
 
 export const getLeaderboardApps = unstable_cache(
   async (): Promise<AiApp[]> => {
-    return [...APPS].sort((a, b) => b.mrr - a.mrr);
+    return [...APPS].sort((a, b) => b.upvotes - a.upvotes);
   },
   ['leaderboard-apps'],
   { tags: ['apps'] }
@@ -146,7 +146,6 @@ export async function createApp(payload: Partial<AiApp>): Promise<{ app: AiApp }
     techStack: Array.isArray(payload.techStack) ? payload.techStack : [],
     websiteUrl: payload.websiteUrl || '',
     users: 0,
-    mrr: 0,
     category: payload.category || 'SaaS',
     upvotes: 0,
     upvoters: [],
@@ -485,7 +484,6 @@ export async function getUserOutboundHelpOffers(
 
 export async function getUserProfileMetrics(userId: string): Promise<{
   appsCount: number;
-  totalMrr: number;
   totalUpvotes: number;
   inboundCount: number;
   outboundCount: number;
@@ -494,7 +492,6 @@ export async function getUserProfileMetrics(userId: string): Promise<{
   const userApps = APPS.filter((app) =>
     app.contributors.some((contributor) => contributor.id === userId)
   );
-  const totalMrr = userApps.reduce((sum, app) => sum + (app.mrr || 0), 0);
   const totalUpvotes = userApps.reduce((sum, app) => sum + (app.upvotes || 0), 0);
 
   let inboundCount = 0;
@@ -520,7 +517,6 @@ export async function getUserProfileMetrics(userId: string): Promise<{
 
   return {
     appsCount: userApps.length,
-    totalMrr,
     totalUpvotes,
     inboundCount,
     outboundCount,
