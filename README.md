@@ -30,7 +30,7 @@ Then open http://localhost:3000.
 - **"I need help" / "Can Help"**:
   - App contributors can post and update what their project needs help with.
   - Visitors can view active help requests and explore the "Can Help" directory.
-- **Leaderboard**: Ranked by monthly recurring revenue (MRR).
+- **Leaderboard**: Ranked by upvotes.
 - **Responsive Layout**: Desktop sidebar navigation and mobile bottom nav with quick action triggers.
 
 ## Project layout
@@ -42,7 +42,7 @@ src/
     (feed)/                # Feed tab routes (Latest, Popular, Need Help, Just Launched)
     apps/[slug]/           # App detail page
     can-help/              # Can Help community matching directory
-    leaderboard/           # MRR Leaderboard
+    leaderboard/           # Leaderboard
   components/              # React Server & Client Components
   context/                 # Client React Contexts (Feed search, Post modal, Session)
   lib/

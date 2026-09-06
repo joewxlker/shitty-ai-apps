@@ -14,8 +14,8 @@ export function Leaderboard({ apps }: { apps: AiApp[] }) {
               <p className="truncate text-xs text-slate-500">{app.tagline}</p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-sm font-semibold text-slate-900">${app.mrr} MRR</p>
-              <p className="text-xs text-slate-400">{app.users} users</p>
+              <p className="text-sm font-semibold text-slate-900">{app.upvotes} upvotes</p>
+              <p className="text-xs text-slate-400">{app.users.toLocaleString()} users</p>
             </div>
           </>
         );
