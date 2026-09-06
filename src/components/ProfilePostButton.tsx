@@ -3,11 +3,7 @@
 import { usePostModal } from '@/context/PostModalContext';
 import { PlusIcon } from './icons';
 
-export function ProfilePostButton({
-  variant = 'link',
-}: {
-  variant?: 'link' | 'button';
-}) {
+export function ProfilePostButton({ variant = 'link' }: { variant?: 'link' | 'button' }) {
   const { openPostModal } = usePostModal();
 
   if (variant === 'button') {

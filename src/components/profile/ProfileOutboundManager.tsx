@@ -31,9 +31,7 @@ export function ProfileOutboundManager({ offers }: ProfileOutboundManagerProps) 
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-900">
-          Outbound offers ({offers.length})
-        </h2>
+        <h2 className="text-lg font-bold text-slate-900">Outbound offers ({offers.length})</h2>
       </div>
 
       {/* Search & Filter Toolbar */}
@@ -61,7 +59,7 @@ export function ProfileOutboundManager({ offers }: ProfileOutboundManagerProps) 
 
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as any)}
+            onChange={(e) => setStatusFilter(e.target.value as 'All' | HelpOfferStatus)}
             className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 outline-none focus:border-brand-500"
           >
             <option value="All">All statuses</option>
@@ -175,5 +173,3 @@ export function ProfileOutboundManager({ offers }: ProfileOutboundManagerProps) 
     </div>
   );
 }
-
-

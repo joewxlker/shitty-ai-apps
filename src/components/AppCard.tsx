@@ -28,9 +28,7 @@ export function AppCard({ app, active = false }: AppCardProps) {
     session?.user?.id && app.contributors.some((contributor) => contributor.id === session.user.id)
   );
 
-  const hasUpvoted = Boolean(
-    session?.user?.id && app.upvoters?.includes(session.user.id)
-  );
+  const hasUpvoted = Boolean(session?.user?.id && app.upvoters?.includes(session.user.id));
 
   const hasHelpRequest = Boolean(app.needsHelpWith);
 
@@ -101,7 +99,9 @@ export function AppCard({ app, active = false }: AppCardProps) {
                   : 'text-slate-500 hover:text-brand-600',
               ].join(' ')}
             >
-              <ArrowUpIcon className={['h-4 w-4', hasUpvoted ? 'stroke-[2.5] text-brand-600' : ''].join(' ')} />
+              <ArrowUpIcon
+                className={['h-4 w-4', hasUpvoted ? 'stroke-[2.5] text-brand-600' : ''].join(' ')}
+              />
               {app.upvotes}
             </button>
           </form>

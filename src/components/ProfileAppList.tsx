@@ -6,7 +6,14 @@ import { useState, useTransition } from 'react';
 import { deleteAppAction } from '@/actions/deleteApp';
 import type { AppWithCommentCount } from '@/lib/types';
 import { CategoryPill } from './CategoryPill';
-import { DollarIcon, ExternalLinkIcon, MessageCircleIcon, PencilIcon, TrashIcon, UsersIcon } from './icons';
+import {
+  DollarIcon,
+  ExternalLinkIcon,
+  MessageCircleIcon,
+  PencilIcon,
+  TrashIcon,
+  UsersIcon,
+} from './icons';
 
 export function ProfileAppList({ apps }: { apps: AppWithCommentCount[] }) {
   const router = useRouter();

@@ -305,5 +305,3 @@ export function ProfileInboundManager({ offers }: ProfileInboundManagerProps) {
     </div>
   );
 }
-
-

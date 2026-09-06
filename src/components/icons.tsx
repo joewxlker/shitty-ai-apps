@@ -191,7 +191,8 @@ export function LoaderIcon(props: IconProps) {
       <path d="m16.3 7.7 2.8-2.8" opacity="1" />
     </svg>
   );
-}export function PencilIcon(props: IconProps) {
+}
+export function PencilIcon(props: IconProps) {
   return (
     <svg {...getProps(props, 'h-4 w-4 shrink-0')}>
       <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
@@ -251,4 +252,3 @@ export function FilterIcon(props: IconProps) {
     </svg>
   );
 }
-

@@ -272,5 +272,3 @@ export function ProfileAppsManager({ apps }: ProfileAppsManagerProps) {
     </div>
   );
 }
-
-

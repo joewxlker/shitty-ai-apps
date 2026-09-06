@@ -10,7 +10,8 @@ export default function AppNotFound() {
         </div>
         <h1 className="text-xl font-bold text-slate-900">App Not Found</h1>
         <p className="mt-2 max-w-sm text-sm text-slate-500">
-          The app you&apos;re looking for does not exist, may have been removed, or the slug in the URL is incorrect.
+          The app you&apos;re looking for does not exist, may have been removed, or the slug in the
+          URL is incorrect.
         </p>
         <Link
           href="/"

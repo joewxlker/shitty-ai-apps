@@ -76,7 +76,6 @@ export interface HelpOfferWithApp extends HelpOffer {
   appEmoji: string;
 }
 
-
 export interface Session {
   user: {
     id: string;

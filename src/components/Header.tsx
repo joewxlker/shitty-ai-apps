@@ -62,18 +62,13 @@ export function Header({ title, subtitle }: { title: string; subtitle: string })
 
             {menuOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-20"
-                  onClick={() => setMenuOpen(false)}
-                />
+                <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-full z-30 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-panel">
                   <div className="border-b border-slate-100 px-3 py-2">
                     <p className="truncate text-xs font-semibold text-slate-900">
                       {session.user.name}
                     </p>
-                    <p className="truncate text-xs text-slate-500">
-                      {session.user.email}
-                    </p>
+                    <p className="truncate text-xs text-slate-500">{session.user.email}</p>
                   </div>
 
                   <div className="mt-1 flex flex-col gap-0.5">

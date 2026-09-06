@@ -96,8 +96,8 @@ export default function AuthPage() {
         <div className="mt-8 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
           <p className="font-semibold text-slate-700">Backend Auth Setup:</p>
           <p className="mt-1">
-            Google Cloud Console OAuth credentials and Supabase Auth hooks are stubbed in this route.
-            Clicking above signs in with the demo account.
+            Google Cloud Console OAuth credentials and Supabase Auth hooks are stubbed in this
+            route. Clicking above signs in with the demo account.
           </p>
         </div>
       </div>

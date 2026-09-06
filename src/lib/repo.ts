@@ -12,7 +12,6 @@ import {
   Tab,
 } from './types';
 
-
 export function getCommentCount(slug: string): number {
   return COMMENTS[slug]?.length ?? 0;
 }
@@ -316,7 +315,6 @@ export async function getUserApps(userId: string): Promise<AppWithCommentCount[]
   }));
 }
 
-
 export async function deleteApp(slug: string): Promise<void> {
   const session = await requireSession();
 
@@ -529,4 +527,3 @@ export async function getUserProfileMetrics(userId: string): Promise<{
     pendingInboundCount,
   };
 }
-
