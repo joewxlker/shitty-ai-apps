@@ -71,6 +71,12 @@ export interface HelpOffer {
   respondedAt?: string; // ISO
 }
 
+export interface HelpOfferWithApp extends HelpOffer {
+  appName: string;
+  appEmoji: string;
+}
+
+
 export interface Session {
   user: {
     id: string;
