@@ -5,7 +5,6 @@ interface ProfileCardProps {
   user: Session['user'];
   stats: {
     appsCount: number;
-    totalMrr: number;
     totalUpvotes: number;
   };
 }
@@ -39,14 +38,10 @@ export function ProfileCard({ user, stats }: ProfileCardProps) {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-3 gap-3 border-t border-slate-100 pt-4 text-center">
+      <div className="mt-6 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-center">
         <div className="rounded-xl bg-slate-50 p-3">
           <p className="text-lg font-bold text-slate-900">{stats.appsCount}</p>
           <p className="text-xs text-slate-500">Apps posted</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-3">
-          <p className="text-lg font-bold text-slate-900">${stats.totalMrr}</p>
-          <p className="text-xs text-slate-500">Total MRR</p>
         </div>
         <div className="rounded-xl bg-slate-50 p-3">
           <p className="text-lg font-bold text-slate-900">{stats.totalUpvotes}</p>

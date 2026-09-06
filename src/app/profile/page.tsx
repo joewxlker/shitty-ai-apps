@@ -44,7 +44,6 @@ async function OverviewContent({ userId, user }: { userId: string; user: Session
         user={user}
         stats={{
           appsCount: metrics.appsCount,
-          totalMrr: metrics.totalMrr,
           totalUpvotes: metrics.totalUpvotes,
         }}
       />
@@ -107,9 +106,6 @@ async function OverviewContent({ userId, user }: { userId: string; user: Session
                 </div>
 
                 <div className="ml-3 flex shrink-0 items-center gap-3 text-xs text-slate-500">
-                  <span className="font-semibold text-slate-700">
-                    ${app.mrr.toLocaleString()} MRR
-                  </span>
                   <span>▲ {app.upvotes}</span>
                 </div>
               </Link>
@@ -285,8 +281,8 @@ function OverviewLoading() {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-3 gap-3 border-t border-slate-100 pt-4">
-          {[1, 2, 3].map((i) => (
+        <div className="mt-6 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+          {[1, 2].map((i) => (
             <div key={i} className="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 p-3">
               <div className="h-6 w-12 rounded bg-slate-200" />
               <div className="h-3 w-16 rounded bg-slate-100" />
@@ -312,7 +308,6 @@ function OverviewLoading() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="h-3 w-16 rounded bg-slate-100" />
                 <div className="h-3 w-10 rounded bg-slate-100" />
               </div>
             </div>

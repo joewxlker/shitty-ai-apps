@@ -24,10 +24,8 @@ import {
   ArrowLeftIcon,
   CheckIcon,
   ClockIcon,
-  DollarIcon,
   ExternalLinkIcon,
   HeartHandshakeIcon,
-  MailIcon,
   MessageCircleIcon,
   PencilIcon,
   SendIcon,
@@ -95,11 +93,7 @@ export function DetailPanel({
         <div className="flex flex-col gap-6 px-5 pb-8 pt-4">
           <AppCover app={app} size="lg" />
           <AppSummary app={app} />
-          <AppActions
-            app={app}
-            canEdit={!!sessionIsContributor}
-            hasUpvoted={hasUpvoted}
-          />
+          <AppActions app={app} canEdit={!!sessionIsContributor} hasUpvoted={hasUpvoted} />
           <About app={app} />
           <TechStack app={app} />
           {app.story && <Story story={app.story} />}
@@ -121,11 +115,7 @@ export function DetailPanel({
             />
           )}
           <HelpCategories categories={app.helpCategories} />
-          <Comments
-            slug={app.slug}
-            comments={comments}
-            inputRef={commentInputRef}
-          />
+          <Comments slug={app.slug} comments={comments} inputRef={commentInputRef} />
         </div>
       )}
     </div>
@@ -171,9 +161,6 @@ function AppSummary({ app }: { app: App }) {
         <span className="inline-flex items-center gap-1">
           <UsersIcon className="h-3.5 w-3.5" />
           {app.users} users
-        </span>
-        <span className="inline-flex items-center gap-1">
-          <DollarIcon className="h-3.5 w-3.5" />${app.mrr} MRR
         </span>
         <span>Launched {formatDate(app.launchedAt)}</span>
       </div>
@@ -388,9 +375,7 @@ function VisitorHelpBlock({
             className="mt-4 flex flex-col gap-3 rounded-xl border border-brand-200 bg-white p-4 shadow-xs"
           >
             <div>
-              <label className="text-xs font-semibold text-slate-800">
-                How can you help?
-              </label>
+              <label className="text-xs font-semibold text-slate-800">How can you help?</label>
               <LimitedTextarea
                 name="message"
                 required
@@ -463,13 +448,7 @@ function VisitorHelpBlock({
   );
 }
 
-function OwnerHelpOffers({
-  slug,
-  offers = [],
-}: {
-  slug: string;
-  offers?: HelpOffer[];
-}) {
+function OwnerHelpOffers({ slug, offers = [] }: { slug: string; offers?: HelpOffer[] }) {
   const [isPending, startTransition] = useTransition();
 
   const handleRespond = (offerId: string, status: 'accepted' | 'declined') => {
@@ -493,7 +472,8 @@ function OwnerHelpOffers({
     >
       {offers.length === 0 ? (
         <p className="mt-2 text-xs text-slate-500">
-          No offers to help yet. When visitors offer to help with your project, their requests will appear here for you to confirm and add as contributors.
+          No offers to help yet. When visitors offer to help with your project, their requests will
+          appear here for you to confirm and add as contributors.
         </p>
       ) : (
         <div className="mt-3 flex flex-col gap-3">
@@ -1008,4 +988,3 @@ function FieldError({ errors }: { errors?: string[] }) {
   if (!errors?.length) return null;
   return <p className="mt-1 text-xs text-red-600">{errors[0]}</p>;
 }
-
